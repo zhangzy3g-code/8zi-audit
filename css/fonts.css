@@ -1,0 +1,15 @@
+/* Noto Serif SC heading subset. Other glyphs use the system Songti fallback. */
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/noto-serif-sc-headings-0.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../fonts/noto-serif-sc-headings-1.ttf) format('truetype');
+}

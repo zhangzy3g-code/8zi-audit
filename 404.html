@@ -5434,6 +5434,7 @@ function collapseModuleInput(kind, summaryText){
     // 进入编辑态就使旧结果失效，防止用户修改了起局参数却继续点
     // “据盘追问”，实际仍提交上一张盘。
     if(kind==='qimen'){
+      QM_REQUEST_SEQ++;
       QM_LAST=null;
       const result=document.getElementById('qm-result');
       if(result){ result.innerHTML=''; result.style.display='none'; }
@@ -5465,6 +5466,11 @@ function inferFortuneTopic(question, fallback){
 async function qimenCast(){
   if(!requireAuthenticatedAction('排局')) return;
   clearError();
+  const requestSeq=++QM_REQUEST_SEQ;
+  // 排局开始时立即作废旧盘；只允许本次请求的完整响应一次性渲染。
+  QM_LAST=null;
+  const staleResult=document.getElementById('qm-result');
+  if(staleResult){ staleResult.innerHTML=''; staleResult.style.display='none'; }
   const btn=document.getElementById('qm-cast');
   const timeInput=document.getElementById('qm-time');
   const rawTime=timeInput ? timeInput.value.trim() : '';
@@ -5488,6 +5494,7 @@ async function qimenCast(){
       body:JSON.stringify({time_str, topic, location, timezone, question, mode:document.getElementById('qm-mode').value||'human_reading'})}, 120000);
     if(!resp.ok){ const err=await resp.json().catch(()=>({})); showError(err.detail||('排局失败（'+resp.status+'）')); setStatus(''); return; }
     const d=await resp.json();
+    if(requestSeq!==QM_REQUEST_SEQ) return;
     QM_LAST=d;
     renderQimen(d, Boolean(question));
     setActionAvailability('qm-ask', true);
@@ -5506,6 +5513,7 @@ async function qimenAsk(){
   const q=document.getElementById('qm-question').value.trim();
   if(!q){ showError('请输入具体问题后再点“按当前问题生成解读”。'); document.getElementById('qm-question').focus(); setStatus(''); return; }
   if(!QM_LAST || !QM_LAST.chart_id){ showError('请先完成排局'); setStatus(''); return; }
+  const requestSeq=++QM_REQUEST_SEQ;
   setStatus('据局咨询中…'); showZoneLoading('qm-result','据局咨询中…（结合古籍依据整理，约需数十秒）'); lockBtn(btn);
   try{
     const topic=document.getElementById('qm-topic').value;
@@ -5517,6 +5525,7 @@ async function qimenAsk(){
       body:JSON.stringify({chart_id:QM_LAST.chart_id, topic, question:q, mode})}, 120000);
     if(!resp.ok){ const err=await resp.json().catch(()=>({})); showError(err.detail||('咨询失败（'+resp.status+'）')); setStatus(''); return; }
     const d=await resp.json();
+    if(requestSeq!==QM_REQUEST_SEQ) return;
     QM_LAST=d;
     renderQimen(d, true);
     collapseModuleInput('qm', `已排局 · ${(d.chart&&d.chart.ju_label)||'奇门局'} · ${topic} · 解读已更新`);
@@ -5526,6 +5535,7 @@ async function qimenAsk(){
   finally{ clearZoneLoading('qm-result'); unlockBtn(btn); }
 }
 let QM_LAST=null;
+let QM_REQUEST_SEQ=0;
 
 // 奇门 3x3 九宫格盘面（洛书位序：4(巽) 9(离) 2(坤) / 3(震) 5(中) 7(兑) / 8(艮) 1(坎) 6(乾)）
 function renderQimenBoard(c, j){

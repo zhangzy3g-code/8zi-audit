@@ -4993,10 +4993,10 @@ function collapseLiuyaoInput(d){
   const summary=zone.querySelector('.liuyao-collapsed-summary');
   if(header){
     const ben=c.ben_gua||'？', bian=c.bian_gua||'无';
-    const moves=(c.changing_lines&&c.changing_lines.length)?c.changing_lines.map(i=>i+1).join('/'):'静卦';
+    const moves=(c.changing_lines&&c.changing_lines.length)?c.changing_lines.map(i=>i+1).join('/')+'爻动':'无动爻';
     const deliveryFailed=readingDeliveryFailed(d);
     if(summary){
-      summary.innerHTML=`<div class="hexagram-badge-bar"><span>已成卦：<strong>${esc(ben)}${bian!=='无'?' 之 '+esc(bian):''}</strong>（${moves}爻动）</span>`+
+      summary.innerHTML=`<div class="hexagram-badge-bar"><span>已成卦：<strong>${esc(ben)}${bian!=='无'?' 之 '+esc(bian):''}</strong>（${moves}）</span>`+
         `${deliveryFailed?'<span class="module-state-note">解读未完成，可重试</span>':''}`+
         `<div class="actions"><button type="button" class="btn-text btn-tertiary" id="ly-askagain">换个问题</button>`+
         `<button type="button" class="btn-text btn-secondary" id="ly-expand">重新起卦</button></div></div>`;
@@ -5013,6 +5013,7 @@ function collapseLiuyaoInput(d){
 // 六爻意图→用神（前端轻量判定，对齐后端 liuyao_intent）
 const LY_INTENT_MAP = {
   "财": "妻财", "财运": "妻财", "求财": "妻财", "买卖": "妻财", "投资": "妻财", "生意": "妻财", "交易": "妻财", "薪酬": "妻财", "金钱": "妻财",
+  "借给朋友的钱": "妻财", "借出去的钱": "妻财", "借款": "妻财", "借钱": "妻财", "还款": "妻财", "还钱": "妻财", "收回来": "妻财", "收回": "妻财",
   "事业": "官鬼", "工作": "官鬼", "官运": "官鬼", "功名": "官鬼", "职位": "官鬼", "求职": "官鬼", "升迁": "官鬼",
   "考试": "父母", "学业": "父母", "文书": "父母", "文凭": "父母", "合同": "父母", "证书": "父母", "文昌": "父母",
   "疾病": "子孙", "健康": "子孙", "医药": "子孙", "身体": "子孙", "子女": "子孙", "生育": "子孙", "怀孕": "子孙",

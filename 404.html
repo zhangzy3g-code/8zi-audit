@@ -1604,7 +1604,7 @@ function openTimeModal(){
     var hh=String(s[1]).padStart(2,'0'), h2=String(s[2]).padStart(2,'0');
     var b=document.createElement('button'); b.type='button';
     b.innerHTML=s[0]+'<span class="tg-range">'+hh+':00 - '+h2+':00</span>';
-    b.onclick=function(){ selectTime(s[0], s[1]); };
+    b.onclick=function(){ selectTime(s[0], s[1], s[2]); };
     grid.appendChild(b);
   });
   box.appendChild(grid);
@@ -1615,14 +1615,21 @@ function openTimeModal(){
   mask.classList.add('show');
 }
 function closeTimeModal(){ var m=document.getElementById('time-mask'); if(m) m.classList.remove('show'); }
-function selectTime(name, hour){
+function selectTime(name, hour, endHour){
   markBaziInputDirty();
   var bt=document.getElementById('btime'); var trig=document.getElementById('time-trigger'); var sub=document.getElementById('time-sub');
   var unknown = hour < 0;
+  // 时辰选择按弹窗文案约定回填区间中点；子时 23:00—01:00 跨午夜，
+  // 需要先把结束小时视作次日 25:00 再取中点，最终回填 00:00。
+  var midpoint = hour;
+  if(!unknown && Number.isFinite(endHour)){
+    var normalizedEnd = endHour <= hour ? endHour + 24 : endHour;
+    midpoint = Math.floor((hour + normalizedEnd) / 2) % 24;
+  }
   var certainty=document.getElementById('bunk');
   if(certainty){ certainty.value = unknown ? 'true' : 'shichen_only'; }
-  if(bt){ bt.value = unknown ? '' : String(hour).padStart(2,'0')+':00'; }
-  if(trig){ trig.firstChild.textContent = (hour>=0? name+'（'+String(hour).padStart(2,'0')+':00） ' : name+' '); }
+  if(bt){ bt.value = unknown ? '' : String(midpoint).padStart(2,'0')+':00'; }
+  if(trig){ trig.firstChild.textContent = (hour>=0? name+'（'+String(midpoint).padStart(2,'0')+':00） ' : name+' '); }
   if(sub){ sub.textContent = unknown ? '具体时间为空：不计算时柱，仅按年、月、日三柱参考' : '已选时辰，可在上方时间框调整分钟'; }
   var mask=document.getElementById('time-mask'); if(mask) mask.classList.remove('show');
   syncTimeTrigger();
@@ -4986,10 +4993,10 @@ function collapseLiuyaoInput(d){
   const summary=zone.querySelector('.liuyao-collapsed-summary');
   if(header){
     const ben=c.ben_gua||'？', bian=c.bian_gua||'无';
-    const moves=(c.changing_lines&&c.changing_lines.length)?c.changing_lines.map(i=>i+1).join('/'):'静卦';
+    const moves=(c.changing_lines&&c.changing_lines.length)?c.changing_lines.map(i=>i+1).join('/')+'爻动':'无动爻';
     const deliveryFailed=readingDeliveryFailed(d);
     if(summary){
-      summary.innerHTML=`<div class="hexagram-badge-bar"><span>已成卦：<strong>${esc(ben)}${bian!=='无'?' 之 '+esc(bian):''}</strong>（${moves}爻动）</span>`+
+      summary.innerHTML=`<div class="hexagram-badge-bar"><span>已成卦：<strong>${esc(ben)}${bian!=='无'?' 之 '+esc(bian):''}</strong>（${moves}）</span>`+
         `${deliveryFailed?'<span class="module-state-note">解读未完成，可重试</span>':''}`+
         `<div class="actions"><button type="button" class="btn-text btn-tertiary" id="ly-askagain">换个问题</button>`+
         `<button type="button" class="btn-text btn-secondary" id="ly-expand">重新起卦</button></div></div>`;
@@ -5006,6 +5013,7 @@ function collapseLiuyaoInput(d){
 // 六爻意图→用神（前端轻量判定，对齐后端 liuyao_intent）
 const LY_INTENT_MAP = {
   "财": "妻财", "财运": "妻财", "求财": "妻财", "买卖": "妻财", "投资": "妻财", "生意": "妻财", "交易": "妻财", "薪酬": "妻财", "金钱": "妻财",
+  "借给朋友的钱": "妻财", "借出去的钱": "妻财", "借款": "妻财", "借钱": "妻财", "还款": "妻财", "还钱": "妻财", "收回来": "妻财", "收回": "妻财",
   "事业": "官鬼", "工作": "官鬼", "官运": "官鬼", "功名": "官鬼", "职位": "官鬼", "求职": "官鬼", "升迁": "官鬼",
   "考试": "父母", "学业": "父母", "文书": "父母", "文凭": "父母", "合同": "父母", "证书": "父母", "文昌": "父母",
   "疾病": "子孙", "健康": "子孙", "医药": "子孙", "身体": "子孙", "子女": "子孙", "生育": "子孙", "怀孕": "子孙",

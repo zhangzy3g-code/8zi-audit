@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
 <script>
 // Public GitHub Pages audit shell: static UI + remote test API.
 window.__TJ_PAGES_AUDIT__ = true;
@@ -27,6 +26,7 @@ window.__TJ_API_ORIGIN__ = 'https://8zhi.ccwu.cc';
 }());
 </script>
 
+<meta charset="utf-8">
 <meta name="application-version" content="3.1.5">
 <link rel="stylesheet" href="./css/fonts.css?v=ux-4">
   <!-- 宋体标题与系统无衬线正文；仅加载使用的字重 -->
@@ -520,16 +520,18 @@ window.__TJ_API_ORIGIN__ = 'https://8zhi.ccwu.cc';
   </div>
   <div class="card flow-method modpanel" id="ziwei-zone" data-module="ziwei" role="tabpanel" aria-labelledby="tab-ziwei">
     <h3>紫微斗数（排盘与典籍依据）</h3>
-    <div class="muted" style="margin-bottom:6px;">按生年天干、农历月日和出生时辰排出十二宫命盘（十四主星与四化）；可靠典籍依据会单独展示，没有可靠出处的内容不引用书名。排盘结果按出生信息计算。</div>
+    <div class="muted" style="margin-bottom:6px;">可选择公历或农历输入。公历模式会由历法底座自动换算农历年月日、闰月和生年干；农历模式会校验普通月/闰月并回显对应公历日期，再按出生时分排出十二宫命盘（十四主星与四化）。可靠典籍依据会单独展示，没有可靠出处的内容不引用书名。</div>
     <div class="module-input-panel" id="zw-input-panel">
     <div class="row module-form-grid ziwei-form-grid">
-      <div><label for="zw-year" title="公历出生年份：直接填您出生的公历年份（如 1990）。系统自动换算生年天干（1990 庚午年→庚），用于紫微四化（禄权科忌）。不必自己算天干。">公历出生年份</label><div class="hint">填实际<b>公历</b>出生年份（如 1990）。系统自动换算生年天干，决定紫微四化（禄权科忌），无需您自己算。</div><input id="zw-year" type="number" value="1990" min="1900" max="2100"></div>
-      <div><label for="zw-month" title="农历月：出生那年的农历月份（正月=1，腊月=12），非公历月份。">农历月（1-12）</label><div class="hint">出生当年的<b>农历</b>月份（正月=1，腊月=12），不是公历月。排命盘十二宫用。</div><input id="zw-month" type="number" value="1" min="1" max="12"></div>
-      <div><label for="zw-day" title="农历日：出生当日的农历日（初一=1，最多30）。">农历日（1-30）</label><div class="hint">出生当日的<b>农历日</b>（初一=1）。紫微落宫必须使用此日，不能默认初一。</div><input id="zw-day" type="number" placeholder="必填，如 15" min="1" max="30" required></div>
-      <div><label for="zw-hour" title="生时地支：出生时辰对应的地支。直接填 0-23 小时即可，系统自动映射：0-1时=子、2-3时=丑、4-5时=寅…22-23时=亥。定命宫所在。">出生小时（0-23）</label><div class="hint">直接输入出生小时，系统会自动换算为十二时辰。</div><input id="zw-hour" type="number" value="0" min="0" max="23"></div>
+      <div><label for="zw-calendar">历法</label><div class="hint">公历自动转换农历；农历可明确选择普通月或闰月。</div><select id="zw-calendar"><option value="solar" selected>公历</option><option value="lunar">农历</option></select></div>
+      <div id="zw-solar-date-field"><label for="zw-solar-date">公历出生日期</label><div class="hint">填写完整公历年月日，例如 2024-02-09。</div><input id="zw-solar-date" type="date" value="1990-01-01" min="1900-01-01" max="2100-12-31" required></div>
+      <div id="zw-lunar-year-field" class="lunar-only" style="display:none;"><label for="zw-year">农历出生年份</label><div class="hint">农历年，例如 2023；公历模式无需手工填写。</div><input id="zw-year" type="number" value="1990" min="1900" max="2100"></div>
+      <div id="zw-month-field" class="lunar-only" style="display:none;"><label for="zw-month">农历月（1-12）</label><div class="hint">正月=1，腊月=12；闰月由下方勾选明确区分。</div><input id="zw-month" type="number" value="1" min="1" max="12"></div>
+      <div id="zw-day-field" class="lunar-only" style="display:none;"><label for="zw-day">农历日（1-30）</label><div class="hint">初一=1；紫微落宫必须使用实际农历日，不能默认初一。</div><input id="zw-day" type="number" placeholder="必填，如 15" min="1" max="30"></div>
+      <div><label for="zw-hour" title="出生时分：按当地钟表时间输入 HH:MM，12:59 属午时，13:00 起属未时。">出生时间（时:分）</label><div class="hint">输入完整时分，例如 12:59；跨边界会重新排盘。</div><input id="zw-hour" type="time" value="00:00" min="00:00" max="23:59" step="60" required></div>
       <div><label for="zw-location">出生地（可选，按经度校时辰）</label><input id="zw-location" placeholder="如：沈阳"></div>
       <div><label for="zw-gender">性别（用于大限顺逆）</label><select id="zw-gender"><option value="">未知（不计算大限）</option><option value="male">男</option><option value="female">女</option></select></div>
-      <div><label class="lunar-leap-control" for="zw-leap"><input id="zw-leap" type="checkbox"> 这是闰月</label><div class="hint">勾选后按本原型的闰月规则记录并参与排盘；不同流派请人工复核。</div></div>
+      <div id="zw-leap-field" class="lunar-only" style="display:none;"><label class="lunar-leap-control" for="zw-leap"><input id="zw-leap" type="checkbox"> 这是闰月</label><div class="hint">只在农历模式使用；非法闰月会被历法底座拒绝。</div></div>
     </div>
     <div class="row" style="margin-top:8px;">
       <div><label for="zw-question">你的问题（据盘咨询，可留空看整体解读）</label>
@@ -3215,7 +3217,8 @@ window.__moduleVisibilityReady=Promise.all([syncDailyTab(),syncModuleVisibility(
 const STEMS = "甲乙丙丁戊己庚辛壬癸";
 const STEM_WUXING = {"甲":"木","乙":"木","丙":"火","丁":"火","戊":"土","己":"土","庚":"金","辛":"金","壬":"水","癸":"水"};
 const BRANCH_WUXING = {"子":"水","丑":"土","寅":"木","卯":"木","辰":"土","巳":"火","午":"火","未":"土","申":"金","酉":"金","戌":"土","亥":"水"};
-// 公历年份 → 生年天干（紫微四化用）。规则：天干序=(年-4)%10（甲=0）。以公历近似，不强制立春分界。
+// 年份 → 生年天干（农历模式的兼容辅助值）。公历模式由服务端按
+// 完整日期转换出的农历年干覆盖，不能仅凭公历年份决定春节前后的四化。
 function yearToGan(y){
   const y2 = parseInt(y, 10);
   if(!y2 || y2<1900 || y2>2100) return "";
@@ -3228,12 +3231,68 @@ function numToGan(n){
   if(isNaN(i)) return "甲";
   return STEMS[((i % 10) + 10) % 10];
 }
-// 紫微「生时地支」改为 0-23 小时输入：按 2 小时一块映射回地支（0-1=子，2-3=丑…22-23=亥）。
-function hourToZhi(h){
-  const i = parseInt(h, 10);
-  if(isNaN(i) || i<0 || i>23) return "";
-  return ZHI_ALL[Math.floor(i / 2) % 12];
+function parseZiweiClock(value){
+  const raw=String(value==null?'':value).trim();
+  if(!raw) return null;
+  let m=raw.match(/^(\d{1,2})(?::(\d{2}))?/);
+  if(!m) return null;
+  const hour=Number(m[1]), minute=Number(m[2]||0);
+  if(!Number.isInteger(hour)||hour<0||hour>23||!Number.isInteger(minute)||minute<0||minute>59) return null;
+  return {hour, minute, text:`${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`};
 }
+// 紫微生时按当地钟表时分映射：子时从 23:00 开始，每两小时进入下一时辰。
+// 这样 12:59 仍是午时，13:00 已进入未时；同时兼容旧客户端传入的整点数字。
+function hourToZhi(h){
+  const clock=parseZiweiClock(h);
+  if(!clock) return "";
+  const minuteOfDay=clock.hour*60+clock.minute;
+  return ZHI_ALL[Math.floor(((minuteOfDay+60)%1440)/120)];
+}
+function hourToLabel(h){
+  const branch=hourToZhi(h);
+  return branch ? `${branch}时` : "";
+}
+function syncZiweiCalendarFields(){
+  const calendar=document.getElementById('zw-calendar')?.value||'solar';
+  const isLunar=calendar==='lunar';
+  const solarField=document.getElementById('zw-solar-date-field');
+  if(solarField) solarField.style.display=isLunar?'none':'';
+  ['zw-lunar-year-field','zw-month-field','zw-day-field','zw-leap-field'].forEach(id=>{
+    const node=document.getElementById(id); if(node) node.style.display=isLunar?'':'';
+  });
+  const solarDate=document.getElementById('zw-solar-date');
+  if(solarDate) solarDate.required=!isLunar;
+  ['zw-year','zw-month','zw-day'].forEach(id=>{
+    const node=document.getElementById(id); if(node) node.required=isLunar;
+  });
+}
+function collectZiweiPayload(question, mode){
+  const calendar=document.getElementById('zw-calendar')?.value||'solar';
+  const clock=parseZiweiClock(document.getElementById('zw-hour')?.value);
+  if(!clock) return {error:'请填写有效的出生时间（HH:MM）'};
+  const gender=document.getElementById('zw-gender').value;
+  const location=document.getElementById('zw-location').value.trim();
+  const base={gender, location, birth_time:clock.text, hour_branch:hourToZhi(clock.text),
+    analysis_year:new Date().getFullYear(), question:question||'', mode:mode||'human_reading'};
+  if(calendar==='solar'){
+    const solarDate=document.getElementById('zw-solar-date')?.value||'';
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(solarDate)) return {error:'请填写完整公历出生日期'};
+    const yearValue=Number(solarDate.slice(0,4));
+    if(!Number.isInteger(yearValue)||yearValue<1900||yearValue>2100) return {error:'请填写 1900–2100 年的公历出生日期'};
+    return {payload:{...base, calendar:'solar', birth_date:solarDate,
+      birth_datetime:`${solarDate}T${clock.text}:00`}};
+  }
+  const yearValue=Number(document.getElementById('zw-year').value);
+  const monthValue=Number(document.getElementById('zw-month').value);
+  const dayValue=Number(document.getElementById('zw-day').value);
+  if(!Number.isInteger(yearValue)||yearValue<1900||yearValue>2100) return {error:'请填写 1900–2100 年的农历出生年份'};
+  if(!Number.isInteger(monthValue)||monthValue<1||monthValue>12) return {error:'请填写 1–12 的出生农历月'};
+  if(!Number.isInteger(dayValue)||dayValue<1||dayValue>30) return {error:'请填写 1–30 的出生农历日'};
+  return {payload:{...base, calendar:'lunar', lunar_year:yearValue, year_gan:yearToGan(yearValue),
+    month:monthValue, day:dayValue, leap_month:document.getElementById('zw-leap').checked}};
+}
+document.getElementById('zw-calendar')?.addEventListener('change', syncZiweiCalendarFields);
+syncZiweiCalendarFields();
 const TEN_GODS = {
   "甲":["比肩","劫财","食神","伤官","偏财","正财","七杀","正官","偏印","正印"],
   "乙":["劫财","比肩","伤官","食神","正财","偏财","正官","七杀","正印","偏印"],
@@ -4275,26 +4334,37 @@ async function genChart(){
       let yg = "";
       if (cs.birth_year) yg = yearToGan(cs.birth_year);
       if (!yg) yg = (pl.year || "")[0] || "";
-      // 填「公历出生年份」输入框（而非天干）；月/时支照旧
+      // 紫微现在优先回填完整公历日期；没有日期快照时才回退到农历字段。
       const ZHI_ALL = "子丑寅卯辰巳午未申酉戌亥";
       const mb = (pl.month || "")[1] || "";
       const lm = mb ? (((ZHI_ALL.indexOf(mb) - 2) % 12) + 12) % 12 + 1 : "";
       const bu = cs.birth_time_uncertain;
-      if (cs.birth_year) document.getElementById("zw-year").value = cs.birth_year;
-      if (lm) document.getElementById("zw-month").value = lm;
-      if (cs.lunar_day) document.getElementById("zw-day").value = cs.lunar_day;
+      const subjectBirth=String((d.subject&&d.subject.birth_datetime)||cs.birth_datetime||"");
+      const subjectDate=subjectBirth.slice(0,10);
+      if(/^\d{4}-\d{2}-\d{2}$/.test(subjectDate)){
+        document.getElementById("zw-calendar").value='solar';
+        document.getElementById("zw-solar-date").value=subjectDate;
+        const timeMatch=subjectBirth.match(/T(\d{2}:\d{2})/);
+        if(timeMatch && !bu) document.getElementById("zw-hour").value=timeMatch[1];
+      }else{
+        document.getElementById("zw-calendar").value='lunar';
+        if (cs.birth_year) document.getElementById("zw-year").value = cs.birth_year;
+        if (lm) document.getElementById("zw-month").value = lm;
+        if (cs.lunar_day) document.getElementById("zw-day").value = cs.lunar_day;
+      }
       if (d.subject && (d.subject.gender === 'male' || d.subject.gender === 'female')) document.getElementById("zw-gender").value = d.subject.gender;
       const zwLeap = document.getElementById("zw-leap");
       if (zwLeap) zwLeap.checked = Number(cs.lunar_month) < 0;
       if (!bu) {
         const hb = (pl.time || "")[1] || "";
-        // zw-hour 现已是 0-23 小时数字输入：地支→起始小时（子=0,丑=2…亥=22）
+        // 没有完整时间快照时，才用八字时支回填一个可编辑的起始时分。
         if (hb) {
           const ZHI_ALL_AUTO = "子丑寅卯辰巳午未申酉戌亥";
           const idx = ZHI_ALL_AUTO.indexOf(hb);
-          document.getElementById("zw-hour").value = (idx >= 0) ? idx * 2 : "";
+          document.getElementById("zw-hour").value = (idx >= 0) ? `${String((idx * 2) % 24).padStart(2,'0')}:00` : "";
         }
       }
+      syncZiweiCalendarFields();
     } catch (e) { /* 联动失败不影响主流程 */ }
     document.getElementById('chart-zone-card').style.display='block';
     unlockBtn(document.getElementById('gen')); // 命盘已渲染即解锁主按钮，概览(runAsk)在后台异步生成，避免「生成命盘中…」长时间卡住
@@ -5643,27 +5713,13 @@ async function ziweiCast(){
   if(!requireAuthenticatedAction('排盘')) return;
   clearError();
   const btn=document.getElementById('zw-cast');
-  const year_gan=yearToGan(document.getElementById('zw-year').value);
-  const month=document.getElementById('zw-month').value.trim();
-  const day=document.getElementById('zw-day').value.trim();
-  const hour_branch=hourToZhi(document.getElementById('zw-hour').value);
-  const location=document.getElementById('zw-location').value.trim();
   const question=document.getElementById('zw-question').value.trim();
-  const yearValue=Number(document.getElementById('zw-year').value);
-  const monthValue=Number(month);
-  const dayValue=Number(day);
-  const hourValue=Number(document.getElementById('zw-hour').value);
-  if(!year_gan || !Number.isInteger(yearValue) || yearValue<1900 || yearValue>2100){ showError('请填写 1900–2100 年的出生年份'); document.getElementById('zw-year').focus(); return; }
-  if(!Number.isInteger(monthValue) || monthValue<1 || monthValue>12){ showError('请填写 1–12 的出生农历月'); document.getElementById('zw-month').focus(); return; }
-  if(!Number.isInteger(dayValue) || dayValue<1 || dayValue>30){ showError('请填写 1–30 的出生农历日'); document.getElementById('zw-day').focus(); return; }
-  if(!hour_branch || !Number.isInteger(hourValue) || hourValue<0 || hourValue>23){ showError('请填写 0–23 的出生时刻'); document.getElementById('zw-hour').focus(); return; }
+  const input=collectZiweiPayload(question, 'human_reading');
+  if(input.error){ showError(input.error); return; }
   setStatus('排盘中…'); showZoneLoading('zw-result','排盘中…（紫微斗数排盘 + 古籍依据整理，约需数十秒）'); lockBtn(btn);
   try{
     const resp=await fetchWithTimeout('/api/v3/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({year_gan, month, day, hour_branch, location,
-        gender:document.getElementById('zw-gender').value,
-        leap_month:document.getElementById('zw-leap').checked,
-        analysis_year:new Date().getFullYear(), question, mode:'human_reading'})}, 120000);
+      body:JSON.stringify(input.payload)}, 120000);
     if(!resp.ok){ const err=await resp.json().catch(()=>({})); showError(err.detail||('排盘失败（'+resp.status+'）')); setStatus(''); return; }
     const d=await resp.json();
     ZW_LAST=d;
@@ -5679,28 +5735,14 @@ async function ziweiAsk(){
   if(!requireAuthenticatedAction('生成紫微解读')) return;
   clearError();
   const btn=document.getElementById('zw-ask');
-  const year_gan=yearToGan(document.getElementById('zw-year').value);
-  const month=document.getElementById('zw-month').value.trim();
-  const day=document.getElementById('zw-day').value.trim();
-  const hour_branch=hourToZhi(document.getElementById('zw-hour').value);
-  const location=document.getElementById('zw-location').value.trim();
-  const yearValue=Number(document.getElementById('zw-year').value);
-  const monthValue=Number(month);
-  const dayValue=Number(day);
-  const hourValue=Number(document.getElementById('zw-hour').value);
-  if(!year_gan || !Number.isInteger(yearValue) || yearValue<1900 || yearValue>2100){ showError('请填写 1900–2100 年的出生年份'); document.getElementById('zw-year').focus(); return; }
-  if(!Number.isInteger(monthValue) || monthValue<1 || monthValue>12){ showError('请填写 1–12 的出生农历月'); document.getElementById('zw-month').focus(); return; }
-  if(!Number.isInteger(dayValue) || dayValue<1 || dayValue>30){ showError('请填写 1–30 的出生农历日'); document.getElementById('zw-day').focus(); return; }
-  if(!hour_branch || !Number.isInteger(hourValue) || hourValue<0 || hourValue>23){ showError('请填写 0–23 的出生时刻'); document.getElementById('zw-hour').focus(); return; }
   const q=document.getElementById('zw-question').value.trim();
+  const input=collectZiweiPayload(q, 'human_reading');
+  if(input.error){ showError(input.error); return; }
   if(!q){ showError('请输入具体问题后再点“按当前命盘生成解读”。'); document.getElementById('zw-question').focus(); setStatus(''); return; }
   setStatus('据盘咨询中…'); showZoneLoading('zw-result','据盘咨询中…（结合古籍依据整理，约需数十秒）'); lockBtn(btn);
   try{
     const resp=await fetchWithTimeout('/api/v3/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({year_gan, month, day, hour_branch, location,
-        gender:document.getElementById('zw-gender').value,
-        leap_month:document.getElementById('zw-leap').checked,
-        analysis_year:new Date().getFullYear(), question:q, mode:'human_reading'})}, 120000);
+      body:JSON.stringify(input.payload)}, 120000);
     if(!resp.ok){ const err=await resp.json().catch(()=>({})); showError(err.detail||('咨询失败（'+resp.status+'）')); setStatus(''); return; }
     const d=await resp.json();
     ZW_LAST=d;
@@ -5747,8 +5789,13 @@ function renderZiweiJudge(d){
 function renderZiwei(d, withAsk){
   const box=document.getElementById('zw-result');
   const c=d.chart||{};
+  const birth=c.birth_context||{};
   const deliveryFailed=readingDeliveryFailed(d);
   let h=`<div class="card"><h3>紫微命盘（命宫${esc(c.ming_palace_branch||'？')}宫 · 身宫${esc(c.shen_palace_branch||'？')}宫）</h3>`;
+  if(birth.solar_date||birth.lunar_date||birth.hour_label||birth.gender){
+    const genderLabel=({male:'男',female:'女',unknown:'未知'})[birth.gender]||birth.gender||'未填写';
+    h+=`<div class="muted zw-birth-context">最终采用：公历 ${esc(birth.solar_date||'未提供')} ${esc(birth.solar_time||'')} · 农历 ${esc(birth.lunar_date||'未提供')} · 时辰 ${esc(birth.hour_label||'未提供')} · 性别 ${esc(genderLabel)}</div>`;
+  }
   h+=renderZiweiBoard(c);
   h+=`<div class="muted">生年四化：${esc(Object.entries(c.sihua||{}).map(([s,l])=>s+l).join(' '))}</div>`;
   h+=`<details class="ly-fold module-raw-data"><summary>查看十二宫完整数据表</summary><div class="module-table-scroll"><table class="bazi"><tr><th>宫</th><th>地支</th><th>五行</th><th>主星</th><th>四化</th></tr>`;
@@ -5867,16 +5914,11 @@ async function askMulti(){
     payload.liuyao=lyNamespace;
   }
   // 紫微参数始终放进独立命名空间。即使联合了八字，也要把页面明确填写的
-  // 年干/农历月/农历日/时支传给后端，不能让“已有八字块”吞掉紫微参数。
+  // 公历/农历日期和精确时分传给后端，不能让“已有八字块”吞掉紫微参数。
   if(modules.includes('ziwei')){
-    const yg=yearToGan(document.getElementById('zw-year').value);
-    const lm=document.getElementById('zw-month').value.trim();
-    const ld=document.getElementById('zw-day').value.trim();
-    const hb=hourToZhi(document.getElementById('zw-hour').value);
-    const zg=document.getElementById('zw-gender').value;
-    if(yg && lm && ld && hb){ payload.ziwei={year_gan:yg, month:lm, day:ld, hour_branch:hb,
-      gender:zg, leap_month:document.getElementById('zw-leap').checked, analysis_year:new Date().getFullYear()}; }
-    else { showError('紫微需参数：请先在「紫微斗数」页填写生年天干/农历月/农历日/生时地支；若已生成八字命盘，请先核对页面自动带入的紫微参数。'); setStatus(''); return; }
+    const zinput=collectZiweiPayload(q, 'human_reading');
+    if(zinput.error){ showError('联合咨询中的紫微参数无效：'+zinput.error); setStatus(''); return; }
+    payload.ziwei=zinput.payload;
   }
   if(CURRENT.user_id) payload.user_id=CURRENT.user_id;
   if(CURRENT.session_id) payload.session_id=CURRENT.session_id;
@@ -6742,9 +6784,9 @@ function saveChartImage(){
 
   <!-- PWA & AppShell Script -->
   <script type="module">
-    import { AppShell } from './js/app-shell.js';
-    import { ApiClient } from './js/api-client.js';
-    import { AppRouter } from './js/router.js';
+    import { AppShell } from '/js/app-shell.js';
+    import { ApiClient } from '/js/api-client.js';
+    import { AppRouter } from '/js/router.js';
 
     // 保证全局统一调用别名
     window.switchTab = function(name) {

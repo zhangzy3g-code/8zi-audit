@@ -17,9 +17,7 @@ window.__TJ_API_ORIGIN__ = 'https://8zhi.ccwu.cc';
   window.fetch = function (input, init) {
     var target = apiUrl(input);
     if (target) {
-      if (typeof Request !== 'undefined' && input instanceof Request) {
-        return nativeFetch(new Request(target, input), init);
-      }
+      if (typeof Request !== 'undefined' && input instanceof Request) return nativeFetch(new Request(target, input), init);
       return nativeFetch(target, init);
     }
     return nativeFetch(input, init);
@@ -5425,11 +5423,12 @@ function collapseModuleInput(kind, summaryText){
   if(edit) edit.onclick=()=>{
     // 进入编辑态就使旧结果失效，防止用户修改了起局参数却继续点
     // “据盘追问”，实际仍提交上一张盘。
-    if(kind==='qimen'){
+    if(kind==='qm'){
       QM_LAST=null;
       const result=document.getElementById('qm-result');
       if(result){ result.innerHTML=''; result.style.display='none'; }
       setActionAvailability('qm-ask', false, '请先重新排局');
+      setStatus('');
     }else if(kind==='ziwei'){
       ZW_LAST=null;
       const result=document.getElementById('zw-result');
@@ -5574,6 +5573,7 @@ function renderQimenJudge(d){
 
 function renderQimen(d, withAsk){
   const box=document.getElementById('qm-result');
+  if(box) box.style.display='';
   const c=d.chart||{};
   const j=d.qimen_judgment||{};
   const deliveryFailed=readingDeliveryFailed(d);

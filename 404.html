@@ -6,6 +6,7 @@
 // Public GitHub Pages audit shell: static UI + remote test API.
 window.__TJ_PAGES_AUDIT__ = true;
 window.__TJ_API_ORIGIN__ = 'https://8zhi.ccwu.cc';
+window.__TJ_SOURCE_COMMIT__ = 'a453a2201d939124bda7d1c147fd1503a6dccc39';
 (function () {
   var apiOrigin = window.__TJ_API_ORIGIN__;
   var nativeFetch = window.fetch.bind(window);
@@ -17,7 +18,9 @@ window.__TJ_API_ORIGIN__ = 'https://8zhi.ccwu.cc';
   window.fetch = function (input, init) {
     var target = apiUrl(input);
     if (target) {
-      if (typeof Request !== 'undefined' && input instanceof Request) return nativeFetch(new Request(target, input), init);
+      if (typeof Request !== 'undefined' && input instanceof Request) {
+        return nativeFetch(new Request(target, input), init);
+      }
       return nativeFetch(target, init);
     }
     return nativeFetch(input, init);
@@ -193,9 +196,9 @@ window.__TJ_API_ORIGIN__ = 'https://8zhi.ccwu.cc';
 
   <div class="modpanel" id="bazi-zone" role="tabpanel" aria-labelledby="tab-bazi">
     <div class="page-heading"><p class="page-kicker">生辰八字</p><h1>一纸命盘，照见自己</h1><p class="page-intro">从生辰出发，读懂命盘中的线索。</p></div>
-    <div class="mode-switch" role="tablist" aria-label="排盘方式">
-    <button type="button" class="mode-tab is-active" data-mode="input" onclick="switchMode('input')">填写生辰</button>
-    <button type="button" class="mode-tab" data-mode="upload" onclick="switchMode('upload')">上传命盘</button>
+    <div class="mode-switch" role="group" aria-label="排盘方式">
+    <button type="button" class="mode-tab is-active" data-mode="input" aria-pressed="true" onclick="switchMode('input')">填写生辰</button>
+    <button type="button" class="mode-tab" data-mode="upload" aria-pressed="false" onclick="switchMode('upload')">上传命盘</button>
   </div>
 
   <!-- 八字首页移动端主操作：命盘按钮离开首屏时在表单前提供快捷入口。 -->
@@ -560,16 +563,16 @@ window.__TJ_API_ORIGIN__ = 'https://8zhi.ccwu.cc';
 
 
 
-    <div class="subtabs" id="xg-subtabs" style="margin-top:12px;display:flex;gap:8px;">
-      <button type="button" class="subtab active" data-xiang-tab="face">面相</button>
-      <button type="button" class="subtab" data-xiang-tab="hand">手相</button>
+    <div class="subtabs" id="xg-subtabs" role="tablist" aria-label="相术类型" style="margin-top:12px;display:flex;gap:8px;">
+      <button type="button" class="subtab active" id="xg-tab-face" role="tab" aria-controls="xg-face-pane" aria-selected="true" tabindex="0" data-xiang-tab="face">面相</button>
+      <button type="button" class="subtab" id="xg-tab-hand" role="tab" aria-controls="xg-hand-pane" aria-selected="false" tabindex="-1" data-xiang-tab="hand">手相</button>
     </div>
 
     <!-- 面相面板 -->
-    <div id="xg-face-pane">
+    <div id="xg-face-pane" role="tabpanel" aria-labelledby="xg-tab-face">
       <div class="row xiang-photo-mode" style="margin-top:12px;">
         <div style="flex:1;"><label>面相照片（可选）</label>
-        <div class="dropzone" id="dz-face" data-target="xg-face">
+        <div class="dropzone" id="dz-face" data-target="xg-face" role="button" tabindex="0" aria-controls="xg-face" aria-label="选择面相照片或拖拽上传">
           <div>点击选择或拖拽面相照片到此处（JPG/PNG/WebP，≤6MB）</div>
           <div class="dz-thumb" id="dz-thumb-face"></div>
           <input id="xg-face" type="file" accept="image/jpeg,image/png,image/webp" aria-label="选择面相照片" hidden>
@@ -593,15 +596,15 @@ window.__TJ_API_ORIGIN__ = 'https://8zhi.ccwu.cc';
     </div>
 
     <!-- 手相面板 -->
-    <div id="xg-hand-pane" style="display:none;">
+    <div id="xg-hand-pane" role="tabpanel" aria-labelledby="xg-tab-hand" hidden>
       <div class="row xiang-photo-mode" style="margin-top:12px;">
         <div style="flex:1;"><label>左手照片（可选）</label>
-        <div class="dropzone" id="dz-hand-left" data-target="xg-hand-left">
+        <div class="dropzone" id="dz-hand-left" data-target="xg-hand-left" role="button" tabindex="0" aria-controls="xg-hand-left" aria-label="选择左手照片或拖拽上传">
           <div>点击/拖拽左手照片</div><div class="dz-thumb" id="dz-thumb-hand-left"></div>
           <input id="xg-hand-left" type="file" accept="image/jpeg,image/png,image/webp" aria-label="选择左手照片" hidden>
         </div></div>
         <div style="flex:1;"><label>右手照片（可选）</label>
-        <div class="dropzone" id="dz-hand-right" data-target="xg-hand-right">
+        <div class="dropzone" id="dz-hand-right" data-target="xg-hand-right" role="button" tabindex="0" aria-controls="xg-hand-right" aria-label="选择右手照片或拖拽上传">
           <div>点击/拖拽右手照片</div><div class="dz-thumb" id="dz-thumb-hand-right"></div>
           <input id="xg-hand-right" type="file" accept="image/jpeg,image/png,image/webp" aria-label="选择右手照片" hidden>
         </div></div>
@@ -1665,7 +1668,11 @@ function toggleTTS(bookId){
 function switchMode(which){
   window.ASK_TARGET = null;
   clearError();
-  document.querySelectorAll('.mode-tab').forEach(function(b){ b.classList.toggle('is-active', b.getAttribute('data-mode')===which); });
+  document.querySelectorAll('.mode-tab').forEach(function(b){
+    var active=b.getAttribute('data-mode')===which;
+    b.classList.toggle('is-active', active);
+    b.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
   var up=document.getElementById('mode-upload');
   if(up) up.style.display = (which==='upload')?'':'none';
   // 上传模式隐藏主#result（手动模式专用，避免双重提问区/占位错位）；输入模式恢复
@@ -5917,13 +5924,36 @@ function xgResultBox(kind){ return kind==='hand' ? 'xg-hand-result' : 'xg-face-r
 function xgLabelsId(kind){ return kind==='hand' ? 'xg-hand-labels' : 'xg-face-labels'; }
 function xgQId(kind){ return kind==='hand' ? 'xg-hand-q' : 'xg-face-q'; }
 
-// 子标签切换（默认面相）
-document.querySelectorAll('#xg-subtabs .subtab').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const k=btn.dataset.xiangTab;
-    document.querySelectorAll('#xg-subtabs .subtab').forEach(b=>b.classList.toggle('active', b===btn));
-    document.getElementById('xg-face-pane').style.display = (k==='face')?'':'none';
-    document.getElementById('xg-hand-pane').style.display = (k==='hand')?'':'none';
+// 子标签切换（默认面相）：使用完整的 tab 语义，并支持方向键/Home/End。
+const xiangTabButtons = Array.from(document.querySelectorAll('#xg-subtabs .subtab'));
+function setXiangTab(kind, { focus = false } = {}){
+  const activeButton = xiangTabButtons.find(btn=>btn.dataset.xiangTab===kind) || xiangTabButtons[0];
+  const activeKind = activeButton ? activeButton.dataset.xiangTab : 'face';
+  xiangTabButtons.forEach(btn=>{
+    const active = btn===activeButton;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    btn.tabIndex = active ? 0 : -1;
+  });
+  const facePane=document.getElementById('xg-face-pane');
+  const handPane=document.getElementById('xg-hand-pane');
+  if(facePane) facePane.hidden = activeKind!=='face';
+  if(handPane) handPane.hidden = activeKind!=='hand';
+  if(focus && activeButton) activeButton.focus();
+}
+xiangTabButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>setXiangTab(btn.dataset.xiangTab));
+  btn.addEventListener('keydown', event=>{
+    const current=xiangTabButtons.indexOf(btn);
+    let next=null;
+    if(event.key==='ArrowRight' || event.key==='ArrowDown') next=(current+1)%xiangTabButtons.length;
+    if(event.key==='ArrowLeft' || event.key==='ArrowUp') next=(current-1+xiangTabButtons.length)%xiangTabButtons.length;
+    if(event.key==='Home') next=0;
+    if(event.key==='End') next=xiangTabButtons.length-1;
+    if(next!==null){
+      event.preventDefault();
+      setXiangTab(xiangTabButtons[next].dataset.xiangTab, {focus:true});
+    }
   });
 });
 document.querySelectorAll('#xiang-zone .manual-feature').forEach(details=>{
@@ -6166,6 +6196,10 @@ function wireDropzone(dzId, inputId, thumbId){
   const dz=document.getElementById(dzId), inp=document.getElementById(inputId), thumb=document.getElementById(thumbId);
   if(!dz||!inp) return;
   dz.addEventListener('click',(e)=>{ if(e.target.closest('.dz-x')) return; inp.click(); });
+  dz.addEventListener('keydown',(e)=>{
+    if(e.target.closest('.dz-x')) return;
+    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); inp.click(); }
+  });
   dz.addEventListener('dragover',(e)=>{ e.preventDefault(); dz.classList.add('drag'); });
   dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
   dz.addEventListener('drop',(e)=>{ e.preventDefault(); dz.classList.remove('drag'); if(e.dataTransfer.files[0]){ inp.files=e.dataTransfer.files; renderThumb(inp,thumb); syncXiangClearButton(inputId); } });

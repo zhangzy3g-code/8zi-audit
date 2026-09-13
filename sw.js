@@ -7,32 +7,40 @@
  */
 
 // 每次前端壳层、图标或样式有结构性变更都递增版本，避免移动端继续命中旧资源。
-const CACHE_NAME = 'tianji-shell-3.1.16';
+const CACHE_NAME = 'tianji-shell-3.1.17';
+const APP_ROOT = new URL('./', self.registration.scope);
+const APP_API_PREFIX = new URL('api/', APP_ROOT).pathname;
+const APP_ADMIN_PREFIX = new URL('admin', APP_ROOT).pathname;
+const appUrl = (path = '') => new URL(path, APP_ROOT).toString();
+const appRoute = (route = '#daily') => {
+  const raw = String(route || '#daily');
+  return appUrl(raw.startsWith('/#') ? raw.slice(1) : raw);
+};
 
 // 静态预缓存核心清单
 const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
-  './manifest.webmanifest?v=3.1.5',
-  './css/fonts.css?v=ux-4',
-  './fonts/noto-serif-sc-headings-0.ttf',
-  './fonts/noto-serif-sc-headings-1.ttf',
-  './css/modules.css?v=ux-4',
-  './css/pages.css?v=ux-4',
-  './js/appearance.js?v=ux-4',
-  './css/tokens.css?v=ux-4',
-  './css/app-shell.css?v=ux-4',
-  './css/components.css?v=ux-4',
-  './css/mobile.css?v=ux-4',
-  './js/api-client.js',
-  './js/router.js',
-  './js/app-shell.js',
-  './icons/icon-192.png?v=3.1.5',
-  './icons/icon-512.png?v=3.1.5',
-  './icons/apple-touch-icon.png?v=3.1.5',
-  './icons/favicon-32.png?v=3.1.5',
-  './icons/favicon-16.png?v=3.1.5',
-  './favicon.ico?v=3.1.5'
+  appUrl(),
+  appUrl('index.html'),
+  appUrl('manifest.webmanifest?v=3.1.5'),
+  appUrl('css/fonts.css?v=ux-4'),
+  appUrl('fonts/noto-serif-sc-headings-0.ttf'),
+  appUrl('fonts/noto-serif-sc-headings-1.ttf'),
+  appUrl('css/modules.css?v=ux-4'),
+  appUrl('css/pages.css?v=ux-4'),
+  appUrl('js/appearance.js?v=ux-4'),
+  appUrl('css/tokens.css?v=ux-4'),
+  appUrl('css/app-shell.css?v=ux-4'),
+  appUrl('css/components.css?v=ux-4'),
+  appUrl('css/mobile.css?v=ux-4'),
+  appUrl('js/api-client.js'),
+  appUrl('js/router.js'),
+  appUrl('js/app-shell.js'),
+  appUrl('icons/icon-192.png?v=3.1.5'),
+  appUrl('icons/icon-512.png?v=3.1.5'),
+  appUrl('icons/apple-touch-icon.png?v=3.1.5'),
+  appUrl('icons/favicon-32.png?v=3.1.5'),
+  appUrl('icons/favicon-16.png?v=3.1.5'),
+  appUrl('favicon.ico?v=3.1.5')
 ];
 
 // 后台 Web Push：通知正文只使用服务端发送的确定性黄历摘要。
@@ -42,18 +50,18 @@ self.addEventListener('push', (event) => {
   const title = data.title || '今日运势已更新';
   const options = {
     body: data.body || '打开天机命理，查看今天的黄历节奏。',
-    icon: './icons/icon-192.png?v=3.1.5',
-    badge: './icons/icon-192.png?v=3.1.5',
+    icon: appUrl('icons/icon-192.png?v=3.1.5'),
+    badge: appUrl('icons/icon-192.png?v=3.1.5'),
     tag: data.tag || 'tianji-daily',
     renotify: false,
-    data: data.data || { url: data.url || '/#daily' }
+    data: data.data || { url: appRoute(data.url || '#daily') }
   };
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const target = (event.notification.data && event.notification.data.url) || '/#daily';
+  const target = appRoute((event.notification.data && event.notification.data.url) || '#daily');
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
       const existing = clients.find((client) => 'focus' in client);
@@ -103,7 +111,12 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // 1. 严格放行：所有 API 接口与 Admin 管理后台直连网络，绝不缓存
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/admin')) {
+  if (
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/admin') ||
+    url.pathname.startsWith(APP_API_PREFIX) ||
+    url.pathname.startsWith(APP_ADMIN_PREFIX)
+  ) {
     return; // 直接使用浏览器默认网络请求
   }
 
@@ -113,7 +126,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // 3. HTML 页面请求：Network First，断网时回退到缓存的 App Shell
-  if (event.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html')) {
+  if (event.request.mode === 'navigate' || url.pathname === APP_ROOT.pathname || url.pathname.endsWith('.html')) {
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {
@@ -126,8 +139,8 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch(() => {
-          // [H-04 FIX] 正确的 Promise 链式回退：先尝试 /index.html，未命中再尝试 /
-          return caches.match('/index.html').then(res => res || caches.match('/'));
+          // [H-04 FIX] 回退到当前 App scope 内的 index，再回退到 scope 根。
+          return caches.match(appUrl('index.html')).then(res => res || caches.match(appUrl()));
         })
     );
     return;
@@ -147,8 +160,9 @@ self.addEventListener('fetch', (event) => {
           console.warn('[SW] Fetch failed for static asset:', event.request.url);
           return cachedResponse || Response.error(); // 网络不可用时回退到缓存
         });
-        // 优先返回缓存，缓存未命中则等待网络
-        return fetchPromise;
+        // 优先返回缓存，缓存未命中则等待网络；同时让 SW 有机会完成后台更新。
+        event.waitUntil(fetchPromise);
+        return cachedResponse || fetchPromise;
       });
     })
   );

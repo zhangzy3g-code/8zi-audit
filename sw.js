@@ -7,7 +7,7 @@
  */
 
 // 每次前端壳层、图标或样式有结构性变更都递增版本，避免移动端继续命中旧资源。
-const CACHE_NAME = 'tianji-shell-3.1.14';
+const CACHE_NAME = 'tianji-shell-3.1.16';
 
 // 静态预缓存核心清单
 const PRECACHE_ASSETS = [
